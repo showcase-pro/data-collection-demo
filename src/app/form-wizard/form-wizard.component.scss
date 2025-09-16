@@ -1,4 +1,4 @@
-// Modern Mobile-First Design
+// Optimized Mobile-First Design
 .form-wizard-container {
   padding: 20px 16px;
   max-width: 100%;
@@ -11,11 +11,6 @@
     max-width: 800px;
   }
 
-  @media (min-width: 1024px) {
-    padding: 40px 32px;
-    max-width: 900px;
-  }
-
   .wizard-card {
     width: 100%;
     background: white;
@@ -23,10 +18,6 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     margin: 0;
-
-    @media (min-width: 768px) {
-      border-radius: 20px;
-    }
 
     mat-card-header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -86,7 +77,7 @@
   }
 }
 
-// Step Content
+// Content Styles
 .step-content {
   margin: 16px 0;
   padding: 0;
@@ -163,7 +154,8 @@
 
 // Sections
 .preference-section,
-.checkbox-section {
+.checkbox-section,
+.security-section {
   margin: 20px 0 28px 0;
   padding: 18px;
   background: #f8fafc;
@@ -173,6 +165,18 @@
   @media (min-width: 768px) {
     margin: 24px 0 32px 0;
     padding: 24px;
+  }
+
+  h4 {
+    margin-top: 0;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 16px;
+    font-size: 1rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.1rem;
+    }
   }
 
   .radio-group {
@@ -243,6 +247,15 @@
         font-size: 0.9rem;
       }
     }
+  }
+
+  mat-slide-toggle {
+    margin: 12px 0;
+  }
+
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 16px;
   }
 }
 
@@ -387,7 +400,7 @@
   }
 }
 
-// Notifications and Info
+// Notifications
 .time-estimate,
 .privacy-notice {
   display: flex;
@@ -415,41 +428,6 @@
   span {
     color: #1e40af;
     line-height: 1.5;
-  }
-}
-
-// Security Section
-.security-section {
-  margin: 20px 0;
-  padding: 16px;
-  background: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-
-  @media (min-width: 768px) {
-    margin: 24px 0;
-    padding: 20px;
-  }
-
-  h4 {
-    margin-top: 0;
-    color: #374151;
-    font-weight: 600;
-    margin-bottom: 16px;
-    font-size: 1rem;
-
-    @media (min-width: 768px) {
-      font-size: 1.1rem;
-    }
-  }
-
-  mat-slide-toggle {
-    margin: 12px 0;
-  }
-
-  mat-form-field {
-    width: 100%;
-    margin-bottom: 16px;
   }
 }
 
