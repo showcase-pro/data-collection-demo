@@ -1,0 +1,60 @@
+<div class="sidebar-container" [class.mobile-hidden]="isMobile">
+  <nav class="navigation-sidebar">
+    <div class="nav-items">
+      <div class="nav-item"
+           [class.active]="currentStep === 0"
+           (click)="navigateToStep(0)">
+        <mat-icon>assignment</mat-icon>
+        <span>Overview</span>
+      </div>
+
+      <div class="nav-item"
+           [class.active]="currentStep === 1"
+           [class.completed]="completedSteps.includes(1)"
+           (click)="navigateToStep(1)">
+        <mat-icon>person</mat-icon>
+        <span>Personal</span>
+        <mat-icon class="status-icon" *ngIf="completedSteps.includes(1)">check_circle</mat-icon>
+      </div>
+
+      <div class="nav-item"
+           [class.active]="currentStep === 2"
+           [class.completed]="completedSteps.includes(2)"
+           (click)="navigateToStep(2)">
+        <mat-icon>settings</mat-icon>
+        <span>Preferences</span>
+        <mat-icon class="status-icon" *ngIf="completedSteps.includes(2)">check_circle</mat-icon>
+      </div>
+
+      <div class="nav-item"
+           [class.active]="currentStep === 3"
+           [class.completed]="completedSteps.includes(3)"
+           (click)="navigateToStep(3)">
+        <mat-icon>security</mat-icon>
+        <span>Security</span>
+        <mat-icon class="status-icon" *ngIf="completedSteps.includes(3)">check_circle</mat-icon>
+      </div>
+
+      <div class="nav-item"
+           [class.active]="currentStep === 4"
+           [class.completed]="completedSteps.includes(4)"
+           (click)="navigateToStep(4)">
+        <mat-icon>check_circle</mat-icon>
+        <span>Review</span>
+        <mat-icon class="status-icon" *ngIf="completedSteps.includes(4)">check_circle</mat-icon>
+      </div>
+    </div>
+
+    <div class="sidebar-actions">
+      <button mat-stroked-button class="action-button" (click)="saveDraft()">
+        <mat-icon>save</mat-icon>
+        Save Draft
+      </button>
+
+      <button mat-stroked-button class="action-button" (click)="loadDraft()">
+        <mat-icon>folder_open</mat-icon>
+        Load Draft
+      </button>
+    </div>
+  </nav>
+</div>

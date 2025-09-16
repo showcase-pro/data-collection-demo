@@ -1,0 +1,581 @@
+<div class="form-wizard-container">
+  <mat-card class="wizard-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ showSubmissionResult ? 'check_circle' : 'assignment' }}</mat-icon>
+        {{ showSubmissionResult ? 'Registration Complete' : 'Data Collection Process' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ showSubmissionResult ? 'Your registration has been successfully submitted' : 'Follow the steps to complete your registration' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Submission Result View -->
+      <div *ngIf="showSubmissionResult" class="submission-result">
+        <div class="success-header">
+          <mat-icon class="success-icon">check_circle</mat-icon>
+          <h2>Registration Successful!</h2>
+          <p>Thank you for completing your registration. Here's a summary of your submitted information:</p>
+        </div>
+
+        <div class="submitted-data">
+          <div class="data-section">
+            <h3><mat-icon>person</mat-icon> Personal Information</h3>
+            <div class="data-row">
+              <span class="label">Name:</span>
+              <span class="value">{{submissionData?.personalInfo?.firstName}} {{submissionData?.personalInfo?.lastName}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Email:</span>
+              <span class="value">{{submissionData?.personalInfo?.email}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Phone:</span>
+              <span class="value">{{submissionData?.personalInfo?.phone}}</span>
+            </div>
+            <div class="data-row" *ngIf="submissionData?.personalInfo?.dateOfBirth">
+              <span class="label">Date of Birth:</span>
+              <span class="value">{{submissionData?.personalInfo?.dateOfBirth | date:'MM/dd/yyyy'}}</span>
+            </div>
+            <div class="data-row" *ngIf="submissionData?.personalInfo?.address">
+              <span class="label">Address:</span>
+              <span class="value">{{submissionData?.personalInfo?.address}}</span>
+            </div>
+          </div>
+
+          <div class="data-section">
+            <h3><mat-icon>settings</mat-icon> Preferences</h3>
+            <div class="data-row">
+              <span class="label">Account Type:</span>
+              <span class="value">{{submissionData?.preferences?.accountType | titlecase}}</span>
+            </div>
+            <div class="data-row" *ngIf="submissionData?.preferences?.companyName">
+              <span class="label">Company:</span>
+              <span class="value">{{submissionData?.preferences?.companyName}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Industry:</span>
+              <span class="value">{{getIndustryLabel(submissionData?.preferences?.industry)}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Language:</span>
+              <span class="value">{{getLanguageLabel(submissionData?.preferences?.language)}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Email Notifications:</span>
+              <span class="value">{{getNotificationStatus(submissionData?.preferences?.emailNotifications)}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">SMS Notifications:</span>
+              <span class="value">{{getNotificationStatus(submissionData?.preferences?.smsNotifications)}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Marketing Emails:</span>
+              <span class="value">{{getNotificationStatus(submissionData?.preferences?.marketingEmails)}}</span>
+            </div>
+          </div>
+
+          <div class="data-section">
+            <h3><mat-icon>security</mat-icon> Security Settings</h3>
+            <div class="data-row">
+              <span class="label">Password:</span>
+              <span class="value">●●●●●●●● (Secured)</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Two-Factor Authentication:</span>
+              <span class="value">{{getNotificationStatus(submissionData?.security?.twoFactorAuth)}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Security Questions:</span>
+              <span class="value">2 questions configured</span>
+            </div>
+            <div class="data-row" *ngIf="submissionData?.security?.recoveryEmail">
+              <span class="label">Recovery Email:</span>
+              <span class="value">{{submissionData?.security?.recoveryEmail}}</span>
+            </div>
+          </div>
+
+          <div class="data-section">
+            <h3><mat-icon>assignment</mat-icon> Agreements</h3>
+            <div class="data-row">
+              <span class="label">Terms of Service:</span>
+              <span class="value">{{submissionData?.agreements?.terms ? 'Accepted' : 'Not Accepted'}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Privacy Policy:</span>
+              <span class="value">{{submissionData?.agreements?.privacy ? 'Accepted' : 'Not Accepted'}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Data Processing:</span>
+              <span class="value">{{submissionData?.agreements?.dataProcessing ? 'Consented' : 'Not Consented'}}</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Newsletter:</span>
+              <span class="value">{{submissionData?.agreements?.newsletter ? 'Subscribed' : 'Not Subscribed'}}</span>
+            </div>
+          </div>
+
+          <div class="submission-info">
+            <div class="data-row">
+              <span class="label">Submitted on:</span>
+              <span class="value">{{submissionData?.submissionTime | date:'MMM dd, yyyy \'at\' h:mm a'}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button mat-raised-button color="primary" (click)="resetForm()">
+            <mat-icon>refresh</mat-icon>
+            Start New Registration
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Stepper (hidden when showing results) -->
+      <div *ngIf="!showSubmissionResult">
+      <mat-stepper #stepper orientation="horizontal" linear (selectionChange)="onStepChange($event)" [selectedIndex]="currentStep">
+
+        <!-- Step 0: Overview -->
+        <mat-step icon="assignment" [completed]="step0Completed">
+          <div class="step-content">
+            <h3>
+              <mat-icon>assignment</mat-icon>
+              Welcome to Data Collection Portal
+            </h3>
+
+            <div class="overview-section">
+              <p>Complete your registration process in 4 simple steps:</p>
+
+              <div class="steps-overview">
+                <div class="overview-card">
+                  <mat-icon>person</mat-icon>
+                  <h4>Personal Information</h4>
+                  <p>Provide your basic personal details including name, email, and contact information.</p>
+                </div>
+
+                <div class="overview-card">
+                  <mat-icon>settings</mat-icon>
+                  <h4>Preferences</h4>
+                  <p>Set up your account preferences, notification settings, and industry information.</p>
+                </div>
+
+                <div class="overview-card">
+                  <mat-icon>security</mat-icon>
+                  <h4>Security</h4>
+                  <p>Secure your account with password, two-factor authentication, and security questions.</p>
+                </div>
+
+                <div class="overview-card">
+                  <mat-icon>check_circle</mat-icon>
+                  <h4>Review & Submit</h4>
+                  <p>Review all your information and submit your registration.</p>
+                </div>
+              </div>
+
+              <div class="time-estimate">
+                <mat-icon>schedule</mat-icon>
+                <span>Estimated time: 5-10 minutes</span>
+              </div>
+
+              <div class="privacy-notice">
+                <mat-icon>privacy_tip</mat-icon>
+                <span>Your data is secure and will be processed according to our privacy policy</span>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button mat-raised-button color="primary" matStepperNext>
+                Start Registration
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-step>
+
+        <!-- Step 1: Personal Information -->
+        <mat-step [stepControl]="personalInfoForm" icon="person" [completed]="step1Completed">
+          <form [formGroup]="personalInfoForm">
+
+            <div class="step-content">
+              <h3>
+                <mat-icon>person</mat-icon>
+                Tell us about yourself
+              </h3>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>First Name</mat-label>
+                  <input matInput formControlName="firstName" placeholder="Enter your first name">
+                  <mat-error *ngIf="personalInfoForm.get('firstName')?.invalid && personalInfoForm.get('firstName')?.touched">
+                    {{getErrorMessage('firstName', personalInfoForm)}}
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Last Name</mat-label>
+                  <input matInput formControlName="lastName" placeholder="Enter your last name">
+                  <mat-error *ngIf="personalInfoForm.get('lastName')?.invalid && personalInfoForm.get('lastName')?.touched">
+                    {{getErrorMessage('lastName', personalInfoForm)}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Date of Birth</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="dateOfBirth" placeholder="MM/DD/YYYY">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="personalInfoForm.get('dateOfBirth')?.invalid && personalInfoForm.get('dateOfBirth')?.touched">
+                  Date of birth is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email Address</mat-label>
+                <input matInput formControlName="email" type="email" placeholder="Enter your email">
+                <mat-icon matSuffix>email</mat-icon>
+                <mat-error *ngIf="personalInfoForm.get('email')?.invalid && personalInfoForm.get('email')?.touched">
+                  {{getErrorMessage('email', personalInfoForm)}}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Phone Number</mat-label>
+                <input matInput formControlName="phone" type="tel" placeholder="+1 (555) 123-4567">
+                <mat-icon matSuffix>phone</mat-icon>
+                <mat-error *ngIf="personalInfoForm.get('phone')?.invalid && personalInfoForm.get('phone')?.touched">
+                  {{getErrorMessage('phone', personalInfoForm)}}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Address</mat-label>
+                <textarea matInput formControlName="address" placeholder="Enter your address" rows="3"></textarea>
+                <mat-icon matSuffix>location_on</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <div class="step-actions">
+              <button mat-stroked-button matStepperPrevious>
+                <mat-icon>arrow_back</mat-icon>
+                Back
+              </button>
+              <button mat-raised-button color="primary" matStepperNext [disabled]="personalInfoForm.invalid">
+                Next
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </form>
+        </mat-step>
+
+        <!-- Step 2: Preferences -->
+        <mat-step [stepControl]="preferencesForm" icon="settings" [completed]="step2Completed">
+          <form [formGroup]="preferencesForm">
+
+            <div class="step-content">
+              <h3>
+                <mat-icon>settings</mat-icon>
+                Set your preferences
+              </h3>
+
+              <div class="preference-section">
+                <h4>Account Type</h4>
+                <mat-radio-group formControlName="accountType" class="radio-group">
+                  <mat-radio-button value="personal">
+                    <div class="radio-content">
+                      <strong>Personal</strong>
+                      <span>For individual use</span>
+                    </div>
+                  </mat-radio-button>
+                  <mat-radio-button value="business">
+                    <div class="radio-content">
+                      <strong>Business</strong>
+                      <span>For companies and teams</span>
+                    </div>
+                  </mat-radio-button>
+                  <mat-radio-button value="enterprise">
+                    <div class="radio-content">
+                      <strong>Enterprise</strong>
+                      <span>For large organizations</span>
+                    </div>
+                  </mat-radio-button>
+                </mat-radio-group>
+              </div>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Company Name</mat-label>
+                <input matInput formControlName="companyName" placeholder="Enter your company name">
+                <mat-icon matSuffix>business</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Industry</mat-label>
+                <mat-select formControlName="industry">
+                  <mat-option *ngFor="let industry of industries" [value]="industry.value">
+                    {{industry.label}}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="preferencesForm.get('industry')?.invalid && preferencesForm.get('industry')?.touched">
+                  Industry is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Preferred Language</mat-label>
+                <mat-select formControlName="language">
+                  <mat-option value="en">English</mat-option>
+                  <mat-option value="es">Spanish</mat-option>
+                  <mat-option value="fr">French</mat-option>
+                  <mat-option value="de">German</mat-option>
+                  <mat-option value="zh">Chinese</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div class="checkbox-section">
+                <h4>Notification Preferences</h4>
+                <mat-checkbox formControlName="emailNotifications">
+                  <div class="checkbox-content">
+                    <strong>Email Notifications</strong>
+                    <span>Receive updates and important information via email</span>
+                  </div>
+                </mat-checkbox>
+                <mat-checkbox formControlName="smsNotifications">
+                  <div class="checkbox-content">
+                    <strong>SMS Notifications</strong>
+                    <span>Get text messages for urgent updates</span>
+                  </div>
+                </mat-checkbox>
+                <mat-checkbox formControlName="marketingEmails">
+                  <div class="checkbox-content">
+                    <strong>Marketing Communications</strong>
+                    <span>Receive promotional offers and news</span>
+                  </div>
+                </mat-checkbox>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button mat-stroked-button matStepperPrevious>
+                <mat-icon>arrow_back</mat-icon>
+                Back
+              </button>
+              <button mat-raised-button color="primary" matStepperNext [disabled]="preferencesForm.invalid">
+                Next
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </form>
+        </mat-step>
+
+        <!-- Step 3: Security -->
+        <mat-step [stepControl]="securityForm" icon="security" [completed]="step3Completed">
+          <form [formGroup]="securityForm">
+
+            <div class="step-content">
+              <h3>
+                <mat-icon>security</mat-icon>
+                Secure your account
+              </h3>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Password</mat-label>
+                  <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Enter password">
+                  <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                  <mat-error *ngIf="securityForm.get('password')?.invalid && securityForm.get('password')?.touched">
+                    Password must be at least 8 characters with uppercase, lowercase, and number
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Confirm Password</mat-label>
+                  <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Re-enter password">
+                  <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                  <mat-error *ngIf="securityForm.get('confirmPassword')?.invalid && securityForm.get('confirmPassword')?.touched">
+                    Passwords do not match
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="security-section">
+                <h4>Two-Factor Authentication</h4>
+                <mat-slide-toggle formControlName="twoFactorAuth">
+                  Enable two-factor authentication for enhanced security
+                </mat-slide-toggle>
+              </div>
+
+              <div class="security-section">
+                <h4>Security Questions</h4>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Security Question 1</mat-label>
+                  <mat-select formControlName="securityQuestion1">
+                    <mat-option value="pet">What was your first pet's name?</mat-option>
+                    <mat-option value="school">What elementary school did you attend?</mat-option>
+                    <mat-option value="city">In what city were you born?</mat-option>
+                    <mat-option value="mother">What is your mother's maiden name?</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Answer</mat-label>
+                  <input matInput formControlName="securityAnswer1" placeholder="Your answer">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Security Question 2</mat-label>
+                  <mat-select formControlName="securityQuestion2">
+                    <mat-option value="car">What was your first car?</mat-option>
+                    <mat-option value="job">What was your first job?</mat-option>
+                    <mat-option value="street">What street did you grow up on?</mat-option>
+                    <mat-option value="friend">What is your best friend's name?</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Answer</mat-label>
+                  <input matInput formControlName="securityAnswer2" placeholder="Your answer">
+                </mat-form-field>
+              </div>
+
+              <div class="security-section">
+                <h4>Recovery Options</h4>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Recovery Email</mat-label>
+                  <input matInput formControlName="recoveryEmail" type="email" placeholder="Alternative email for account recovery">
+                  <mat-icon matSuffix>email</mat-icon>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button mat-stroked-button matStepperPrevious>
+                <mat-icon>arrow_back</mat-icon>
+                Back
+              </button>
+              <button mat-raised-button color="primary" matStepperNext [disabled]="securityForm.invalid">
+                Next
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </form>
+        </mat-step>
+
+        <!-- Step 4: Review & Submit -->
+        <mat-step [stepControl]="reviewForm" icon="check_circle">
+          <form [formGroup]="reviewForm">
+
+            <div class="step-content">
+              <h3>
+                <mat-icon>check_circle</mat-icon>
+                Review your information
+              </h3>
+
+              <!-- Review Section -->
+              <div class="review-section">
+                <h4>Personal Information</h4>
+                <div class="review-item">
+                  <span class="label">Name:</span>
+                  <span class="value">{{personalInfoForm.value.firstName}} {{personalInfoForm.value.lastName}}</span>
+                </div>
+                <div class="review-item">
+                  <span class="label">Date of Birth:</span>
+                  <span class="value">{{personalInfoForm.value.dateOfBirth | date:'MM/dd/yyyy'}}</span>
+                </div>
+                <div class="review-item">
+                  <span class="label">Email:</span>
+                  <span class="value">{{personalInfoForm.value.email}}</span>
+                </div>
+                <div class="review-item">
+                  <span class="label">Phone:</span>
+                  <span class="value">{{personalInfoForm.value.phone}}</span>
+                </div>
+                <div class="review-item" *ngIf="personalInfoForm.value.address">
+                  <span class="label">Address:</span>
+                  <span class="value">{{personalInfoForm.value.address}}</span>
+                </div>
+              </div>
+
+              <div class="review-section">
+                <h4>Preferences</h4>
+                <div class="review-item">
+                  <span class="label">Account Type:</span>
+                  <span class="value">{{preferencesForm.value.accountType | titlecase}}</span>
+                </div>
+                <div class="review-item" *ngIf="preferencesForm.value.companyName">
+                  <span class="label">Company:</span>
+                  <span class="value">{{preferencesForm.value.companyName}}</span>
+                </div>
+                <div class="review-item">
+                  <span class="label">Industry:</span>
+                  <span class="value">{{getIndustryLabel(preferencesForm.value.industry)}}</span>
+                </div>
+                <div class="review-item">
+                  <span class="label">Language:</span>
+                  <span class="value">{{getLanguageLabel(preferencesForm.value.language)}}</span>
+                </div>
+                <div class="review-item">
+                  <span class="label">Notifications:</span>
+                  <span class="value">{{getNotificationSummary()}}</span>
+                </div>
+              </div>
+
+              <div class="review-section">
+                <h4>Security Settings</h4>
+                <div class="review-item">
+                  <span class="label">Password:</span>
+                  <span class="value">●●●●●●●● (Secured)</span>
+                </div>
+                <div class="review-item">
+                  <span class="label">Two-Factor Auth:</span>
+                  <span class="value">{{securityForm.value.twoFactorAuth ? 'Enabled' : 'Disabled'}}</span>
+                </div>
+                <div class="review-item">
+                  <span class="label">Security Questions:</span>
+                  <span class="value">2 questions configured</span>
+                </div>
+                <div class="review-item" *ngIf="securityForm.value.recoveryEmail">
+                  <span class="label">Recovery Email:</span>
+                  <span class="value">{{securityForm.value.recoveryEmail}}</span>
+                </div>
+              </div>
+
+              <!-- Terms & Conditions -->
+              <div class="terms-section">
+                <h4>Terms & Conditions</h4>
+                <mat-checkbox formControlName="terms">
+                  <span>I agree to the <a href="#" target="_blank">Terms of Service</a></span>
+                </mat-checkbox>
+                <mat-checkbox formControlName="privacy">
+                  <span>I agree to the <a href="#" target="_blank">Privacy Policy</a></span>
+                </mat-checkbox>
+                <mat-checkbox formControlName="dataProcessing">
+                  <span>I consent to data processing as described in the privacy policy</span>
+                </mat-checkbox>
+                <mat-checkbox formControlName="newsletter">
+                  <span>Subscribe to newsletter for updates and tips (optional)</span>
+                </mat-checkbox>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button mat-stroked-button matStepperPrevious>
+                <mat-icon>arrow_back</mat-icon>
+                Back
+              </button>
+              <button mat-raised-button color="primary" class="submit-button" (click)="onSubmit()" [disabled]="!isFormValid()">
+                <mat-icon>send</mat-icon>
+                Submit Registration
+              </button>
+            </div>
+          </form>
+        </mat-step>
+      </mat-stepper>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
